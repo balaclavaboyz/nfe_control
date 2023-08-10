@@ -9,5 +9,8 @@
 # quem
     apenas eu mesmo
 
+TODO
+
+    fazer testes para func sqlite e parser de xml
 python reqs:
     req.txt
