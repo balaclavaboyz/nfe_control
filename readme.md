@@ -9,5 +9,11 @@
 # quem
     apenas eu mesmo
 
+TODO
+    plot graphs
+    sql
+        delete, update
+    testes
+
 python reqs:
     req.txt
