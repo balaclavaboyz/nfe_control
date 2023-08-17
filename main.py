@@ -17,6 +17,7 @@ import pandas
 import xmltodict
 import xml.etree.ElementTree as ET
 
+
 def parse_nfe_xml(x):
     list_res = []
     xml_dados = {"header": {}, "destinatario/remetente": {}, "prod": {}}
@@ -159,68 +160,6 @@ def check_old_xml(filenames):
         return to_be_added
 
 
-def save_header(res, con):
-    header = res['header']
-    cur = con.cursor()
-
-    cur.execute('''
-        insert into header(chave_acesso,
-        cnpj,
-        ie,
-        natureza,
-        protocolo,
-        "fk_cnpj/cpf"
-        ) values(?,?,?,?,?,?)
-    
-    ''', (header['chave_acesso'],
-          header['cnpj'],
-          header['ie'],
-          header['natureza'],
-          header['protocolo'],
-          res['destinatario/remetente']['cnpj/cpf']))
-    # cur.execute('select * from header')
-    # print(cur.fetchone())
-
-    cur.execute('''
-    select "id_header" from header order by "id_header" desc limit 1
-    ''')
-    # print(cur.fetchone())
-    id_header = cur.fetchone()[0]
-    return id_header
-
-
-def save_prods(res, con, id_header):
-    prod = res['prod']
-    cur = con.cursor()
-
-    for i, v in prod.items():
-        cur.execute('''insert into prod(
-        cfop,
-        codigo,
-        csosn,
-        descricao,
-        fk_header,
-        "ncm/sh",
-        qnt,
-        unid,
-        vlrunit)values(?,?,?,?,?,?,?,?,?)''', (
-            v['cfop'],
-            v['codigo'],
-            v['csosn'],
-            v['descricao'],
-            # fk header
-            int(id_header),
-            # v['id'],
-            v['ncm/sh'],
-            v['qnt'],
-            v['unid'],
-            v['vlrunit']
-        ))
-
-    # cur.execute('select * from prod')
-    # print(cur.fetchall())
-
-
 if __name__ == "__main__":
     # from cProfile import Profile
     # from pstats import SortKey, Stats
@@ -241,8 +180,13 @@ if __name__ == "__main__":
     # df = pandas.DataFrame()
 
     con = sqlite3.connect("db.db")
-    cur = con.cursor()
-
+    sql=Sql()
+    # reset
+    # Sql.delete_prod(con)
+    # Sql.delete_header(con)
+    # Sql.delete_cliente(con)
+    #
+    # exit()
     mypath = "./xmls/"
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
     list_parsed_xml = []
@@ -260,9 +204,9 @@ if __name__ == "__main__":
                     # case: nfe is cancelled or ebazer.com.br
                     continue
 
-                save_profile(res, con)
-                id_header = save_header(res, con)
-                save_prods(res, con, id_header)
+                sql.save_profile(res, con)
+                id_header = sql.save_header(res, con)
+                sql.save_prods(res, con, id_header)
                 con.commit()
                 with open('./known_files/know_files.pickle', 'rb') as fff:
                     old = pickle.load(fff)
@@ -278,7 +222,7 @@ if __name__ == "__main__":
                 for i in res['prod']:
                     new_prod = pandas.DataFrame([i])
                     prod = pandas.concat([prod, new_prod], ignore_index=True)
-
+    exit()
     desti = desti[desti.nome != 'EBAZAR.COM.BR LTDA']
     uf_count = desti.groupby(['uf']).agg(len).sort_values(['nome'], ascending=False)
     print(uf_count.columns)
