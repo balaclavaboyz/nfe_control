@@ -80,6 +80,66 @@ class Sql:
         # print(profile_id)
         con.commit()
 
+    def save_prods(res, con, id_header):
+        prod = res['prod']
+        cur = con.cursor()
+
+        for i, v in prod.items():
+            cur.execute('''insert into prod(
+            cfop,
+            codigo,
+            csosn,
+            descricao,
+            fk_header,
+            "ncm/sh",
+            qnt,
+            unid,
+            vlrunit)values(?,?,?,?,?,?,?,?,?)''', (
+                v['cfop'],
+                v['codigo'],
+                v['csosn'],
+                v['descricao'],
+                # fk header
+                int(id_header),
+                # v['id'],
+                v['ncm/sh'],
+                v['qnt'],
+                v['unid'],
+                v['vlrunit']
+            ))
+
+        # cur.execute('select * from prod')
+        # print(cur.fetchall())
+
+    def save_header(res, con):
+        header = res['header']
+        cur = con.cursor()
+
+        cur.execute('''
+            insert into header(chave_acesso,
+            cnpj,
+            ie,
+            natureza,
+            protocolo,
+            "fk_cnpj/cpf"
+            ) values(?,?,?,?,?,?)
+
+        ''', (header['chave_acesso'],
+              header['cnpj'],
+              header['ie'],
+              header['natureza'],
+              header['protocolo'],
+              res['destinatario/remetente']['cnpj/cpf']))
+        # cur.execute('select * from header')
+        # print(cur.fetchone())
+
+        cur.execute('''
+        select "id_header" from header order by "id_header" desc limit 1
+        ''')
+        # print(cur.fetchone())
+        id_header = cur.fetchone()[0]
+        return id_header
+
     def delete_cliente(con: sqlite3.Connection):
         cur = con.cursor()
         cur.execute('delete from cliente')

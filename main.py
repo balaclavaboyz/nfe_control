@@ -1,3 +1,6 @@
+# own module
+from sql import Sql
+
 import pickle
 import re
 import os
@@ -136,35 +139,6 @@ def parse_nfe_xml(x):
                 j += 1
 
     return xml_dados
-
-
-def save_profile(nfe, con):
-    # debuggin
-    show_last_insert = False
-    #
-    cur = con.cursor()
-    profile_id = nfe['destinatario/remetente']['cnpj/cpf']
-
-    cur.execute('''
-        select * from cliente where "cnpj/cpf" == ?
-    ''', (profile_id,))
-    if cur.fetchone() is None:
-        cur.execute('''
-            insert into cliente (bairro,cep,"cnpj/cpf","data_da_entrada/saida",emissao,municipio,nome,uf) values(?,?,?,?,?,?,?,?)
-        ''', (nfe['destinatario/remetente']['bairro'],
-              nfe['destinatario/remetente']['cep'],
-              nfe['destinatario/remetente']['cnpj/cpf'],
-              nfe['destinatario/remetente']['data_da_entrada/saida'],
-              nfe['destinatario/remetente']['emissao'],
-              nfe['destinatario/remetente']['municipio'],
-              nfe['destinatario/remetente']['nome'],
-              nfe['destinatario/remetente']['uf']))
-        if show_last_insert:
-            cur.execute('''
-            select * from cliente order by "cnpj/cpf" desc limit 1
-            ''')
-            print(cur.fetchone())
-    # print(profile_id)
 
 
 def check_old_xml(filenames):
