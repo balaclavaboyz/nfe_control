@@ -4,10 +4,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Sql:
-    def __init__(self):
-        pass
 
-    def create_tables(con: sqlite3.Connection):
+    def create_tables(self,con: sqlite3.Connection):
         cur = con.cursor()
         cur.execute('''
           CREATE TABLE IF NOT EXISTS "cliente" (
@@ -51,7 +49,7 @@ class Sql:
         );
         ''')
 
-    def save_profile(nfe, con: sqlite3.Connection):
+    def save_profile(self,nfe, con: sqlite3.Connection):
         # debuggin
         show_last_insert = False
         #
@@ -80,7 +78,7 @@ class Sql:
         # print(profile_id)
         con.commit()
 
-    def save_prods(res, con, id_header):
+    def save_prods(self,res, con, id_header):
         prod = res['prod']
         cur = con.cursor()
 
@@ -111,7 +109,7 @@ class Sql:
         # cur.execute('select * from prod')
         # print(cur.fetchall())
 
-    def save_header(res, con):
+    def save_header(self,res, con):
         header = res['header']
         cur = con.cursor()
 
@@ -140,17 +138,17 @@ class Sql:
         id_header = cur.fetchone()[0]
         return id_header
 
-    def delete_cliente(con: sqlite3.Connection):
+    def delete_cliente(self,con: sqlite3.Connection):
         cur = con.cursor()
         cur.execute('delete from cliente')
         con.commit()
 
-    def delete_header(con:sqlite3.Connection):
+    def delete_header(self,con:sqlite3.Connection):
         cur=con.cursor()
         cur.execute('delete from header')
         con.commit()
 
-    def delete_prod(con:sqlite3.Connection):
+    def delete_prod(self,con:sqlite3.Connection):
         cur=con.cursor()
         cur.execute('delete from prod')
         con.commit()
