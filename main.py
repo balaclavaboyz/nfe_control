@@ -207,7 +207,6 @@ if __name__ == "__main__":
                 sql.save_profile(res, con)
                 id_header = sql.save_header(res, con)
                 sql.save_prods(res, con, id_header)
-                con.commit()
                 with open('./known_files/know_files.pickle', 'rb') as fff:
                     old = pickle.load(fff)
                     for i in list_to_be_added:

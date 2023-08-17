@@ -5,7 +5,7 @@ from dataclasses import dataclass
 @dataclass
 class Sql:
 
-    def create_tables(self,con: sqlite3.Connection):
+    def create_tables(self, con: sqlite3.Connection):
         cur = con.cursor()
         cur.execute('''
           CREATE TABLE IF NOT EXISTS "cliente" (
@@ -48,8 +48,9 @@ class Sql:
             FOREIGN KEY("fk_header") REFERENCES "header"("id_header") on delete cascade
         );
         ''')
+        con.commit()
 
-    def save_profile(self,nfe, con: sqlite3.Connection):
+    def save_profile(self, nfe, con: sqlite3.Connection):
         # debuggin
         show_last_insert = False
         #
@@ -78,7 +79,7 @@ class Sql:
         # print(profile_id)
         con.commit()
 
-    def save_prods(self,res, con, id_header):
+    def save_prods(self, res, con, id_header):
         prod = res['prod']
         cur = con.cursor()
 
@@ -108,8 +109,9 @@ class Sql:
 
         # cur.execute('select * from prod')
         # print(cur.fetchall())
+        con.commit()
 
-    def save_header(self,res, con):
+    def save_header(self, res, con):
         header = res['header']
         cur = con.cursor()
 
@@ -135,20 +137,21 @@ class Sql:
         select "id_header" from header order by "id_header" desc limit 1
         ''')
         # print(cur.fetchone())
+        con.commit()
         id_header = cur.fetchone()[0]
         return id_header
 
-    def delete_cliente(self,con: sqlite3.Connection):
+    def delete_cliente(self, con: sqlite3.Connection):
         cur = con.cursor()
         cur.execute('delete from cliente')
         con.commit()
 
-    def delete_header(self,con:sqlite3.Connection):
-        cur=con.cursor()
+    def delete_header(self, con: sqlite3.Connection):
+        cur = con.cursor()
         cur.execute('delete from header')
         con.commit()
 
-    def delete_prod(self,con:sqlite3.Connection):
-        cur=con.cursor()
+    def delete_prod(self, con: sqlite3.Connection):
+        cur = con.cursor()
         cur.execute('delete from prod')
         con.commit()
