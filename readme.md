@@ -10,10 +10,11 @@
     apenas eu mesmo
 
 TODO
-    plot graphs
     sql
-        delete, update
-    testes
+        crud basico
+        queries basicos
+    plot graphs
+    por ultimo testes
 
 
     fazer testes para func sqlite e parser de xml
