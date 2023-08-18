@@ -187,58 +187,61 @@ if __name__ == "__main__":
     # df = pandas.DataFrame()
 
     con = sqlite3.connect("db.db")
-    sql=Sql()
-    # reset
-    # Sql.delete_prod(con)
-    # Sql.delete_header(con)
-    # Sql.delete_cliente(con)
-    #
+    sql = Sql()
+    # reset history, sqlite db
+    # sql.delete_prod(con)
+    # sql.delete_header(con)
+    # sql.delete_cliente(con)
+    # os.remove('./known_files/know_files.pickle')
     # exit()
+
     mypath = "./xmls/"
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
     list_parsed_xml = []
+    desti = pandas.DataFrame()
+    prod = pandas.DataFrame()
 
     list_to_be_added = check_old_xml(onlyfiles)
-    if list_to_be_added is not None:
-        # adding new entry to db
-        desti = pandas.DataFrame()
-        prod = pandas.DataFrame()
+
+    if list_to_be_added:
         for xml_file in list_to_be_added:
             with open(f"{mypath}/{xml_file}") as f:
                 # list_parsed_xml.append(parse_nfe_xml(xmltodict.parse(f.read())))
                 res = parse_nfe_xml(xmltodict.parse(f.read()))
                 if res is None or res['destinatario/remetente']['nome'] == 'EBAZAR.COM.BR LTDA':
-                    # case: nfe is cancelled or ebazer.com.br
+                    with open('./known_files/know_files.pickle', 'rb') as fff:
+                        old = pickle.load(fff)
+                        old.append(xml_file)
+                        with open('./known_files/know_files.pickle', 'wb') as ff:
+                            pickle.dump(old, ff)
                     continue
 
                 sql.save_profile(res, con)
                 id_header = sql.save_header(res, con)
                 sql.save_prods(res, con, id_header)
+
                 with open('./known_files/know_files.pickle', 'rb') as fff:
                     old = pickle.load(fff)
-                    for i in list_to_be_added:
-                        old.append(i)
+                    old.append(xml_file)
                     with open('./known_files/know_files.pickle', 'wb') as ff:
                         pickle.dump(old, ff)
-
-                exit()
-                new_desti = pandas.DataFrame([res['destinatario/remetente']])
-                desti = pandas.concat([desti, new_desti], ignore_index=True)
-
-                for i in res['prod']:
-                    new_prod = pandas.DataFrame([i])
-                    prod = pandas.concat([prod, new_prod], ignore_index=True)
-    exit()
-    desti = desti[desti.nome != 'EBAZAR.COM.BR LTDA']
-    uf_count = desti.groupby(['uf']).agg(len).sort_values(['nome'], ascending=False)
-    print(uf_count.columns)
-    print(uf_count.index)
+                        
+    #     new_desti = pandas.DataFrame([res['destinatario/remetente']])
+    #     desti = pandas.concat([desti, new_desti], ignore_index=True)
+    #
+    # for i in res['prod']:
+    #     new_prod = pandas.DataFrame([i])
+    #     prod = pandas.concat([prod, new_prod], ignore_index=True)
+    # desti = desti[desti.nome != 'EBAZAR.COM.BR LTDA']
+    # uf_count = desti.groupby(['uf']).agg(len).sort_values(['nome'], ascending=False)
+    # print(uf_count.columns)
+    # print(uf_count.index)
 
     # numero de venda por uf
-    uf_count['municipio'].plot(kind='bar', subplots=True, sharex=True, sharey=True, title='Ocorrencia de vendas por UF')
-    plt.show()
+    # uf_count['municipio'].plot(kind='bar', subplots=True, sharex=True, sharey=True, title='Ocorrencia de vendas por UF')
+    # plt.show()
 
-    print(prod)
+    # print(prod)
     # quai prods
 
     # pprint(list_parsed_xml[0]['destinatario/remetente'])
