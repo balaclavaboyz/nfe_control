@@ -142,7 +142,7 @@ def parse_nfe_xml(x):
     return xml_dados
 
 
-def check_old_xml(filenames):
+def check_old_xml(current_files: list):
     if not os.path.exists(f'./known_files/know_files.pickle') or os.path.getsize(
             './known_files/know_files.pickle') == 0:
         file_names = []
@@ -151,12 +151,19 @@ def check_old_xml(filenames):
 
     with open('./known_files/know_files.pickle', 'rb') as f:
         to_be_added = []
-        file_names = pickle.load(f)
-        for x in filenames:
-            if x not in file_names:
+        hist = pickle.load(f)
+        for x in current_files:
+            # TODO o que ta acontencedo aqui???
+            # python ta bugando aqui
+            # mas funciona no final, so na etapa no meio que nao mostra certo(?)
+            # deu certo
+            if x in hist:
+                pass
+            else:
                 to_be_added.append(x)
-        if not to_be_added:
-            return None
+        # isso aqui tava bugando a check da list em cima
+        # if not to_be_added:
+        #     return None
         return to_be_added
 
 
