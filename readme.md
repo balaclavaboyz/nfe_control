@@ -13,6 +13,7 @@ TODO
     sql
         crud basico
         queries basicos
+    extrair methods no final do arquivo para file de plot
     plot graphs
     por ultimo testes
 
